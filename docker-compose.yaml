@@ -6,7 +6,7 @@ services:
     build:
         context: node
     container_name: app
-    # entrypoint: dockerize -wait tcp://database:3306 -timeout 50s docker-entrypoint.sh
+    entrypoint: dockerize -wait tcp://db:3306 -timeout 20s node index.js
     command: bash -c "npm install && node index.js"
     networks:
         - node-network
@@ -32,7 +32,7 @@ services:
       - node-network
 
   db:
-      image: mysql:5.7
+      image: mysql:latest
       command: --innodb-use-native-aio=0
       container_name: db
       restart: always
@@ -47,3 +47,18 @@ services:
 networks:
   node-network:
     driver: bridge
+
+volumes:
+  nginxconf:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: './nginx/'
+
+  appvolume:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: './node/'
